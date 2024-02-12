@@ -36,14 +36,14 @@ pipeline{
             }
         }
         
-         stage('NotifyByEmail'){
-            steps{
-                emailext(
-                        subject:"Jenkins Pipeline completed!",
-                        body:"Bookzy Project using Jenkins pipline job done successfully",
-                        to:"009shreyashraiyani@gmail.com")
-            }
-        }
+        //  stage('NotifyByEmail'){
+        //     steps{
+        //         emailext(
+        //                 subject:"Jenkins Pipeline completed!",
+        //                 body:"Bookzy Project using Jenkins pipline job done successfully",
+        //                 to:"009shreyashraiyani@gmail.com")
+        //     }
+        // }
      
    
     }
@@ -53,6 +53,21 @@ pipeline{
                 junit checksName: 'Testss', testResults: '**/target/surefire-reports/TEST-*.xml'
                 archiveArtifacts 'target/*.war'
                 }
+             changed {
+                script {
+                    if (currentBuild.currentResult == 'FAILURE') { 
+                        emailext subject: 'Jenkins Pipeline Failed',
+                                 body: '$DEFAULT_CONTENT',
+                        recipientProviders: [
+                            [$class: 'CulpritsRecipientProvider'],
+                            [$class: 'DevelopersRecipientProvider'],
+                            [$class: 'RequesterRecipientProvider'] 
+                        ], 
+                        replyTo: '009shreyashraiyani@gmail.com',
+                        to: '009shreyashraiyani@gmail.com'
+                }
+            }
+        }
             }
        
 }
